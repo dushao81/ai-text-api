@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI文本处理API - 免费文本分析工具</title>
+    <meta name="description" content="免费的AI文本处理API，支持文本摘要、关键词提取、情感分析、字数统计。">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; }
+        header { background: linear-gradient(135deg, #1e293b, #0f172a); padding: 60px 20px; text-align: center; border-bottom: 1px solid #1e40af; }
+        header h1 { font-size: 2.5rem; color: #60a5fa; margin-bottom: 15px; }
+        header p { color: #94a3b8; font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .demo-box { background: #1e293b; border-radius: 12px; padding: 30px; margin: 30px 0; border: 1px solid #334155; }
+        .demo-box h2 { color: #60a5fa; margin-bottom: 20px; }
+        textarea { width: 100%; padding: 15px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #e2e8f0; font-size: 0.95rem; resize: vertical; min-height: 120px; }
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin: 15px 0; }
+        button { padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: background 0.2s; }
+        button:hover { background: #2563eb; }
+        .result { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 15px; margin-top: 15px; min-height: 60px; color: #94a3b8; font-size: 0.9rem; white-space: pre-wrap; }
+        .api-docs { margin-top: 40px; }
+        .endpoint { background: #1e293b; border-radius: 8px; padding: 20px; margin-bottom: 15px; border-left: 4px solid #3b82f6; }
+        .endpoint code { background: #0f172a; padding: 3px 8px; border-radius: 4px; color: #60a5fa; font-size: 0.9rem; }
+        footer { text-align: center; padding: 40px; color: #475569; border-top: 1px solid #1e293b; margin-top: 60px; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>⚡ AI文本处理API</h1>
+        <p>免费开放的文本分析工具，支持摘要提取、关键词分析、情感判断</p>
+    </header>
+    <div class="container">
+        <div class="demo-box">
+            <h2>🧪 在线体验</h2>
+            <textarea id="inputText" placeholder="在这里输入要分析的文本..."></textarea>
+            <div class="btn-group">
+                <button onclick="analyze('wordcount')">📊 字数统计</button>
+                <button onclick="analyze('keywords')">🔑 关键词提取</button>
+                <button onclick="analyze('sentiment')">😊 情感分析</button>
+                <button onclick="analyze('summarize')">📝 文本摘要</button>
+            </div>
+            <div class="result" id="result">点击上方按钮开始分析...</div>
+        </div>
+        <div class="api-docs">
+            <h2 style="color:#60a5fa;margin-bottom:20px;">📖 API文档</h2>
+            <div class="endpoint">
+                <strong>字数统计</strong><br>
+                <code>GET /api/wordcount?text=你的文本</code>
+                <p style="margin-top:10px;color:#94a3b8;">返回字数、字符数、行数</p>
+            </div>
+            <div class="endpoint">
+                <strong>关键词提取</strong><br>
+                <code>POST /api/keywords</code> body: <code>{"text": "你的文本"}</code>
+                <p style="margin-top:10px;color:#94a3b8;">返回Top10关键词列表</p>
+            </div>
+            <div class="endpoint">
+                <strong>情感分析</strong><br>
+                <code>POST /api/sentiment</code> body: <code>{"text": "你的文本"}</code>
+                <p style="margin-top:10px;color:#94a3b8;">返回情感倾向：positive/negative/neutral</p>
+            </div>
+            <div class="endpoint">
+                <strong>文本摘要</strong><br>
+                <code>POST /api/summarize</code> body: <code>{"text": "你的文本"}</code>
+                <p style="margin-top:10px;color:#94a3b8;">返回文本核心摘要</p>
+            </div>
+        </div>
+    </div>
+    <footer>© 2024 AI文本处理API | 免费开放使用</footer>
+    <script>
+        function analyze(type) {
+            const text = document.getElementById('inputText').value.trim();
+            if (!text) { document.getElementById('result').textContent = '请先输入文本！'; return; }
+            const result = document.getElementById('result');
+            result.textContent = '分析中...';
+            if (type === 'wordcount') {
+                const chars = text.length;
+                const lines = text.split('\n').length;
+                result.textContent = `字符数：${chars}\n行数：${lines}`;
+            } else if (type === 'keywords') {
+                const words = text.match(/[\w\u4e00-\u9fa5]{2,}/g) || [];
+                const freq = {};
+                words.forEach(w => freq[w] = (freq[w]||0)+1);
+                const top = Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([w,c])=>`${w}(${c}次)`);
+                result.textContent = '关键词：' + top.join('、');
+            } else if (type === 'sentiment') {
+                const pos = ['好','棒','赞','优秀','喜欢','满意','开心','完美','厉害','不错'];
+                const neg = ['差','烂','糟','失望','讨厌','难过','糟糕','垃圾','坑','无语'];
+                const p = pos.filter(w=>text.includes(w)).length;
+                const n = neg.filter(w=>text.includes(w)).length;
+                const s = p>n?'😊 正面积极':n>p?'😞 负面消极':'😐 中性平稳';
+                result.textContent = `情感倾向：${s}\n正面词：${p}个，负面词：${n}个`;
+            } else if (type === 'summarize') {
+                const sents = text.split(/[。！？\n]+/).filter(s=>s.trim());
+                if (sents.length <= 2) { result.textContent = text; return; }
+                result.textContent = '摘要：' + sents[0] + '。……' + sents[sents.length-1];
+            }
+        }
+    </script>
+</body>
+</html>
