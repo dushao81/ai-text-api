@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dushao81.github.io/ai-text-api/sitemap.xml
